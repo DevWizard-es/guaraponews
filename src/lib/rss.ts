@@ -1,6 +1,6 @@
 import Parser from 'rss-parser';
 import { parse } from 'node-html-parser';
-import { saveArticle, Article, deleteOldArticles } from './db';
+import { saveArticle, Article, deleteOldArticles, setLastUpdate } from './db';
 
 const parser = new Parser({
   customFields: {

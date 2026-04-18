@@ -5,7 +5,7 @@ export const revalidate = 600; // Recache every 10 mins
 
 export default async function Home() {
   // Fetch initial batch for ES Language and 'Todas' category
-  const initialArticles = getArticles(1, 12, [], 'es');
+  const initialArticles = await getArticles(1, 12, [], 'es');
 
   return (
     <main className="container">

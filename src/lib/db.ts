@@ -139,6 +139,13 @@ export interface Article {
   lang: string;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  password: string;
+  preferred_lang?: string;
+}
+
 export async function saveSubscriber(name: string, email: string) {
   await client.execute({
     sql: "INSERT INTO subscribers (name, email, created_at) VALUES (?, ?, ?)",
@@ -222,15 +229,22 @@ export async function trackClick(userId: string, category: string) {
   });
 }
 
-export async function getUserByUsername(username: string) {
+export async function getUserByUsername(username: string): Promise<User | null> {
   const rs = await client.execute({
     sql: "SELECT * FROM users WHERE username = ?",
     args: [username]
   });
-  return rs.rows[0];
+  if (rs.rows.length === 0) return null;
+  const row = rs.rows[0];
+  return {
+    id: String(row.id),
+    username: String(row.username),
+    password: String(row.password),
+    preferred_lang: String(row.preferred_lang || 'es')
+  };
 }
 
-export async function createUser(user: any) {
+export async function createUser(user: User) {
   await client.execute({
     sql: "INSERT INTO users (id, username, password, preferred_lang) VALUES (?, ?, ?, ?)",
     args: [user.id, user.username, user.password, user.preferred_lang || 'es']

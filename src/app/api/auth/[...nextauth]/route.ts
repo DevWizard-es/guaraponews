@@ -14,16 +14,18 @@ export const authOptions: NextAuthOptions = {
         isRegister: { label: "Register", type: "text" }
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) return null;
+        if (!credentials?.username || !credentials?.password) {
+          return null;
+        }
 
-        const existingUser = await getUserByUsername(credentials.username);
+        const existingUser = await getUserByUsername(credentials.username as string);
 
         if (credentials.isRegister === 'true') {
           if (existingUser) throw new Error('Usuario ya existe');
-          const hashedPassword = await bcrypt.hash(credentials.password, 10);
+          const hashedPassword = await bcrypt.hash(credentials.password as string, 10);
           const newUser = {
             id: uuidv4(),
-            username: credentials.username,
+            username: credentials.username as string,
             password: hashedPassword,
             preferred_lang: 'es'
           };
@@ -33,11 +35,11 @@ export const authOptions: NextAuthOptions = {
 
         if (!existingUser) throw new Error('Usuario no encontrado');
         
-        const isValid = await bcrypt.compare(credentials.password, existingUser.password);
+        const isValid = await bcrypt.compare(credentials.password as string, existingUser.password);
         if (!isValid) throw new Error('Contraseña incorrecta');
 
-          return { id: existingUser.id, name: existingUser.username };
-        }
+        return { id: existingUser.id, name: existingUser.username };
+      }
       })
     ],
     callbacks: {
