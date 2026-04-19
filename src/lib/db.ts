@@ -146,11 +146,23 @@ export interface User {
   preferred_lang?: string;
 }
 
+export interface Subscriber {
+  id: number;
+  name: string;
+  email: string;
+  created_at: number;
+}
+
 export async function saveSubscriber(name: string, email: string) {
   await client.execute({
     sql: "INSERT INTO subscribers (name, email, created_at) VALUES (?, ?, ?)",
     args: [name, email, Date.now()]
   });
+}
+
+export async function getSubscribers(): Promise<Subscriber[]> {
+  const rs = await client.execute("SELECT * FROM subscribers");
+  return rs.rows as any;
 }
 
 export async function getArticles(page = 1, limit = 12, categories: string[] = [], lang = 'es', userId?: string, search?: string): Promise<Article[]> {

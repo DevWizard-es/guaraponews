@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Nombre y email válidos requeridos' }, { status: 400 });
     }
 
-    saveSubscriber(name, email);
+    await saveSubscriber(name, email);
     
     return NextResponse.json({ success: true });
   } catch (error: any) {

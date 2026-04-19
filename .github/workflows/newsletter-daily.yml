@@ -1,0 +1,14 @@
+name: Daily Newsletter Digest
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Every day at 08:00 AM UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Newsletter API
+        run: |
+          curl -X GET "https://guaraponews.vercel.app/api/cron/newsletter?secret=${{ secrets.CRON_SECRET }}"

@@ -53,6 +53,12 @@ body {
   padding: 0 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
 .headline-font {
   font-family: 'Playfair Display', serif;
   letter-spacing: -0.03em;
@@ -145,7 +151,20 @@ body {
 
 @media (max-width: 1200px) {
   .bento-grid { grid-template-columns: repeat(2, 1fr); }
-  .span-large, .span-wide, .span-tall, .span-standard { grid-column: span 1; grid-row: auto; min-height: 400px; }
+  .span-large, .span-wide, .span-tall, .span-standard { grid-column: span 1; grid-row: auto; min-height: 420px; }
+}
+
+@media (max-width: 768px) {
+  .bento-grid { 
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+    grid-auto-rows: auto;
+  }
+  .span-large, .span-wide, .span-tall, .span-standard { 
+    grid-column: span 1; 
+    grid-row: auto; 
+    min-height: auto; 
+  }
 }
 
 /* Category Header (Small Caps) */
@@ -185,6 +204,10 @@ body {
   .list-item-image { flex: 0 0 auto; width: 100%; height: 240px; }
 }
 
+@media (max-width: 480px) {
+  .list-item-image { height: 200px; }
+}
+
 /* Authority Typography */
 .author-pill {
   font-size: 0.7rem;
@@ -206,6 +229,13 @@ body {
   margin: 4rem 0;
   position: relative;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .xtra-banner {
+    padding: 2.5rem 1.5rem;
+    margin: 2.5rem 0;
+  }
 }
 
 .xtra-banner::before {

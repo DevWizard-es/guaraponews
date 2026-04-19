@@ -38,6 +38,7 @@ export default function NewsFeed({ initialArticles }: Props) {
   const [hasMore, setHasMore] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [hasShownNewsletter, setHasShownNewsletter] = useState(false);
   
   const observer = useRef<IntersectionObserver | null>(null);
   const revealObserver = useRef<IntersectionObserver | null>(null);
@@ -48,10 +49,27 @@ export default function NewsFeed({ initialArticles }: Props) {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = (window.scrollY / totalHeight) * 100;
       setScrollProgress(progress);
+
+      // Auto-trigger newsletter at 60% scroll
+      if (progress > 60 && !hasShownNewsletter && !session) {
+        setShowNewsletter(true);
+        setHasShownNewsletter(true);
+      }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [hasShownNewsletter, session]);
+
+  // Auto-trigger newsletter after 45s
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasShownNewsletter && !session) {
+        setShowNewsletter(true);
+        setHasShownNewsletter(true);
+      }
+    }, 45000);
+    return () => clearTimeout(timer);
+  }, [hasShownNewsletter, session]);
 
   // Reveal Animations
   const setupRevealObserver = useCallback(() => {
@@ -148,27 +166,27 @@ export default function NewsFeed({ initialArticles }: Props) {
       <NewsletterModal isOpen={showNewsletter} onClose={() => setShowNewsletter(false)} />
       
       {/* MINIMAL BRAND HEADER */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(30px)', borderBottom: '1px solid var(--border)', padding: '0.8rem 0' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
+      <div className="header-main" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(30px)', borderBottom: '1px solid var(--border)', padding: '0.8rem 0' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+          <Link href="/" style={{ textDecoration: 'none', minWidth: 'max-content' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <h1 className="headline-font" style={{ fontSize: '1.8rem', fontWeight: 900, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>Guarapo<span style={{ color: 'var(--accent)' }}>News</span></h1>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px', marginTop: '4px' }}>{t.tagline[lang]}</span>
+              <h1 className="headline-font logo-text" style={{ fontWeight: 900, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>Guarapo<span style={{ color: 'var(--accent)' }}>News</span></h1>
+              <span className="hide-mobile" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px', marginTop: '4px' }}>{t.tagline[lang]}</span>
             </div>
           </Link>
           
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-             <a href="https://guarapoia.com/" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.8rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+             <a href="https://guarapoia.com/" target="_blank" rel="noopener noreferrer" className="btn-primary hide-mobile" style={{ padding: '0.5rem 1.25rem', fontSize: '0.8rem' }}>
               <Sparkles size={14} /> <span>{t.visitAI[lang]}</span>
             </a>
 
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '2px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.05)' }}>
-               <button onClick={() => setLang('es')} style={{ padding: '0.4rem 0.8rem', borderRadius: '100px', border: 'none', cursor: 'pointer', background: lang === 'es' ? 'var(--accent)' : 'transparent', color: lang === 'es' ? 'black' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.65rem' }}>ES</button>
-               <button onClick={() => setLang('en')} style={{ padding: '0.4rem 0.8rem', borderRadius: '100px', border: 'none', cursor: 'pointer', background: lang === 'en' ? 'var(--accent)' : 'transparent', color: lang === 'en' ? 'black' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.65rem' }}>EN</button>
+               <button onClick={() => setLang('es')} style={{ padding: '0.4rem 0.6rem', borderRadius: '100px', border: 'none', cursor: 'pointer', background: lang === 'es' ? 'var(--accent)' : 'transparent', color: lang === 'es' ? 'black' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.6rem' }}>ES</button>
+               <button onClick={() => setLang('en')} style={{ padding: '0.4rem 0.6rem', borderRadius: '100px', border: 'none', cursor: 'pointer', background: lang === 'en' ? 'var(--accent)' : 'transparent', color: lang === 'en' ? 'black' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.6rem' }}>EN</button>
             </div>
 
             {!session ? (
-              <button onClick={() => signIn()} style={{ background: 'white', color: 'black', border: 'none', borderRadius: '100px', padding: '0.5rem 1rem', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer' }}>
+              <button className="login-btn" onClick={() => signIn()} style={{ background: 'white', color: 'black', border: 'none', borderRadius: '100px', padding: '0.5rem 1.2rem', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                 {t.login[lang]}
               </button>
             ) : (
@@ -179,6 +197,15 @@ export default function NewsFeed({ initialArticles }: Props) {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .logo-text { font-size: 1.8rem; }
+        @media (max-width: 768px) {
+          .logo-text { font-size: 1.3rem; }
+          .hide-mobile { display: none !important; }
+          .login-btn { padding: 0.4rem 0.8rem !important; font-size: 0.65rem !important; }
+        }
+      `}</style>
 
       {/* XATAKA STYLE TRENDING BAR */}
       <TrendingBar lang={lang} onSelectCategory={(topic) => {
@@ -262,12 +289,18 @@ export default function NewsFeed({ initialArticles }: Props) {
                            <div className="price-pill"><Flame size={10} /> {price[0]}</div>
                          )}
                       </div>
-                      <h2 className="headline-font" style={{ fontSize: i === 0 ? '2.8rem' : '1.8rem', fontWeight: 900, marginBottom: '1.5rem', color: 'white', lineHeight: 1.1 }}>{article.title}</h2>
+                      <h2 className="headline-font card-title" style={{ fontWeight: 900, marginBottom: '1.5rem', color: 'white', lineHeight: 1.1 }}>{article.title}</h2>
                       <div style={{ marginTop: 'auto' }}>
                         <div className="author-pill"><UserCheck size={14} color="var(--accent)" /> {t.author[lang]} • {Math.ceil(article.bullets.length * 0.5) + 1} {t.readTime[lang]}</div>
                       </div>
                   </div>
                 </a>
+                <style jsx>{`
+                  .card-title { font-size: ${i === 0 ? '2.8rem' : '1.8rem'}; }
+                  @media (max-width: 768px) {
+                    .card-title { font-size: 1.6rem !important; }
+                  }
+                `}</style>
               </article>
             );
           })}

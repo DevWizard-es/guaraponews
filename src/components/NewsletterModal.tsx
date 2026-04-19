@@ -44,11 +44,17 @@ export default function NewsletterModal({ isOpen, onClose }: Props) {
 
   return (
     <div className="animate-fade-in" style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div className="glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '3rem', position: 'relative', border: '1px solid var(--accent)' }}>
+      <div className="glass-panel modal-content" style={{ width: '100%', maxWidth: '500px', padding: '3rem', position: 'relative', border: '1px solid var(--accent)' }}>
         
         <button onClick={onClose} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <X size={24} />
         </button>
+
+        <style jsx>{`
+          @media (max-width: 600px) {
+            .modal-content { padding: 2rem 1.25rem !important; }
+          }
+        `}</style>
 
         {status === 'success' ? (
           <div style={{ textAlign: 'center', padding: '2rem 0' }}>
