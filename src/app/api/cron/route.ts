@@ -3,8 +3,13 @@ import { fetchAndUpdateFeeds } from '@/lib/rss';
 
 export async function GET(req: Request) {
   try {
-    // In production, you would check an authorization header here to prevent abuse
-    // e.g. if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) return new Response('Unauthorized', { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const secret = searchParams.get('secret');
+    
+    // In production, check for the secret to prevent abuse
+    if (secret !== process.env.CRON_SECRET && process.env.NODE_ENV === 'production') {
+      return new Response('Unauthorized', { status: 401 });
+    }
     
     const addedCount = await fetchAndUpdateFeeds();
     

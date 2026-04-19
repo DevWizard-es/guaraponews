@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
             preferred_lang: 'es'
           };
           await createUser(newUser);
-          return { id: newUser.id, name: newUser.username };
+          return { id: String(newUser.id), name: String(newUser.username) };
         }
 
         if (!existingUser) throw new Error('Usuario no encontrado');
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
         const isValid = await bcrypt.compare(credentials.password as string, existingUser.password);
         if (!isValid) throw new Error('Contraseña incorrecta');
 
-        return { id: existingUser.id, name: existingUser.username };
+        return { id: String(existingUser.id), name: String(existingUser.username) };
       }
       })
     ],
