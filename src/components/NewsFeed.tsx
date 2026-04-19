@@ -204,6 +204,7 @@ export default function NewsFeed({ initialArticles }: Props) {
           .logo-text { font-size: 1.3rem; }
           .hide-mobile { display: none !important; }
           .login-btn { padding: 0.4rem 0.8rem !important; font-size: 0.65rem !important; }
+          .card-title { font-size: 1.6rem !important; }
         }
       `}</style>
 
@@ -289,18 +290,12 @@ export default function NewsFeed({ initialArticles }: Props) {
                            <div className="price-pill"><Flame size={10} /> {price[0]}</div>
                          )}
                       </div>
-                      <h2 className="headline-font card-title" style={{ fontWeight: 900, marginBottom: '1.5rem', color: 'white', lineHeight: 1.1 }}>{article.title}</h2>
+                      <h2 className="headline-font card-title" style={{ fontSize: i === 0 ? '2.8rem' : '1.8rem', fontWeight: 900, marginBottom: '1.5rem', color: 'white', lineHeight: 1.1 }}>{article.title}</h2>
                       <div style={{ marginTop: 'auto' }}>
                         <div className="author-pill"><UserCheck size={14} color="var(--accent)" /> {t.author[lang]} • {Math.ceil(article.bullets.length * 0.5) + 1} {t.readTime[lang]}</div>
                       </div>
                   </div>
                 </a>
-                <style jsx>{`
-                  .card-title { font-size: ${i === 0 ? '2.8rem' : '1.8rem'}; }
-                  @media (max-width: 768px) {
-                    .card-title { font-size: 1.6rem !important; }
-                  }
-                `}</style>
               </article>
             );
           })}

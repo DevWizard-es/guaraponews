@@ -50,12 +50,6 @@ export default function NewsletterModal({ isOpen, onClose }: Props) {
           <X size={24} />
         </button>
 
-        <style jsx>{`
-          @media (max-width: 600px) {
-            .modal-content { padding: 2rem 1.25rem !important; }
-          }
-        `}</style>
-
         {status === 'success' ? (
           <div style={{ textAlign: 'center', padding: '2rem 0' }}>
             <CheckCircle2 size={60} color="var(--accent)" style={{ margin: '0 auto 1.5rem' }} />
@@ -113,6 +107,11 @@ export default function NewsletterModal({ isOpen, onClose }: Props) {
           </>
         )}
       </div>
+      <style jsx>{`
+        @media (max-width: 600px) {
+          .modal-content { padding: 2rem 1.25rem !important; }
+        }
+      `}</style>
     </div>
   );
 }
