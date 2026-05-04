@@ -121,7 +121,6 @@ export async function getTrends(limit = 7, lang = 'es'): Promise<string[]> {
   });
 
   return Object.entries(scores)
-    .filter(([_, score]) => score >= 2)
     .sort((a, b) => b[1] - a[1])
     .map(([word]) => word)
     .slice(0, limit);

@@ -3,6 +3,7 @@ import { parse } from 'node-html-parser';
 import { saveArticle, Article, deleteOldArticles, setLastUpdate } from './db';
 
 const parser = new Parser({
+  timeout: 8000,
   customFields: {
     item: [
       ['media:content', 'media'],
@@ -22,84 +23,59 @@ interface FeedConfig {
 }
 
 const FEEDS: FeedConfig[] = [
-  // --- MUNDO / GLOBAL (Top Tier Agencies) ---
-  { url: 'https://feeds.reuters.com/Reuters/worldNews', source: 'Reuters', category: 'Mundo', lang: 'en' },
-  { url: 'https://feeds.apnews.com/rss/apf-topnews', source: 'Associated Press', category: 'Mundo', lang: 'en' },
+  // --- MUNDO / GLOBAL ---
   { url: 'http://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC News', category: 'Mundo', lang: 'en' },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', source: 'NY Times', category: 'Mundo', lang: 'en' },
-  { url: 'https://www.theguardian.com/world/rss', source: 'The Guardian', category: 'Mundo', lang: 'en' },
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', source: 'Al Jazeera', category: 'Mundo', lang: 'en' },
-  { url: 'https://rss.dw.com/rdf/rss-en-all', source: 'Deutsche Welle', category: 'Mundo', lang: 'en' },
-  { url: 'https://www.france24.com/en/rss', source: 'France 24', category: 'Mundo', lang: 'en' },
-  { url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/internacional/portada.xml', source: 'El País', category: 'Mundo', lang: 'es' },
+  { url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada', source: 'El País', category: 'Mundo', lang: 'es' },
+  { url: 'https://www.elmundo.es/rss/portada.xml', source: 'El Mundo', category: 'Mundo', lang: 'es' },
   { url: 'https://www.rtve.es/api/noticias/noticias_mundo.rss', source: 'RTVE Mundo', category: 'Mundo', lang: 'es' },
 
-  // --- FINANZAS / NEGOCIOS (Top Tier) ---
-  { url: 'https://feeds.bloomberg.com/business/news.rss', source: 'Bloomberg', category: 'Finanzas', lang: 'en' },
+  // --- FINANZAS / NEGOCIOS ---
   { url: 'https://www.ft.com/?format=rss', source: 'Financial Times', category: 'Finanzas', lang: 'en' },
-  { url: 'https://feeds.a.dj.com/rss/RSSBusiness.xml', source: 'WSJ Business', category: 'Finanzas', lang: 'en' },
   { url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', source: 'CNBC', category: 'Finanzas', lang: 'en' },
   { url: 'https://www.marketwatch.com/rss/topstories', source: 'MarketWatch', category: 'Finanzas', lang: 'en' },
-  { url: 'https://www.eleconomista.es/rss/', source: 'elEconomista', category: 'Finanzas', lang: 'es' },
-  { url: 'https://cincodias.elpais.com/rss/', source: 'Cinco Días', category: 'Finanzas', lang: 'es' },
-  { url: 'https://www.expansion.com/rss/portada.xml', source: 'Expansión', category: 'Finanzas', lang: 'es' },
+  { url: 'https://www.eleconomista.es/rss/rss-portada.php', source: 'elEconomista', category: 'Finanzas', lang: 'es' },
+  { url: 'https://e00-expansion.uecdn.es/rss/portada.xml', source: 'Expansión', category: 'Finanzas', lang: 'es' },
 
-  // --- TECNOLOGÍA (Diversified) ---
-  { url: 'https://feeds.reuters.com/reuters/technologyNews', source: 'Reuters Tech', category: 'Tecnología', lang: 'en' },
+  // --- TECNOLOGÍA ---
   { url: 'https://www.theverge.com/rss/index.xml', source: 'The Verge', category: 'Tecnología', lang: 'en' },
-  { url: 'https://feeds.weblogssl.com/xataka2', source: 'Xataka', category: 'Tecnología', lang: 'es' },
-  { url: 'https://es.gizmodo.com/rss', source: 'Gizmodo ES', category: 'Tecnología', lang: 'es' },
   { url: 'https://www.wired.com/feed/rss', source: 'Wired', category: 'Tecnología', lang: 'en' },
-  { url: 'https://www.techradar.com/rss', source: 'TechRadar', category: 'Tecnología', lang: 'en' },
   { url: 'https://arstechnica.com/feed/', source: 'Ars Technica', category: 'Tecnología', lang: 'en' },
-  { url: 'https://www.engadget.com/rss.xml', source: 'Engadget', category: 'Tecnología', lang: 'en' },
+  { url: 'https://feeds.weblogssl.com/xataka2', source: 'Xataka', category: 'Tecnología', lang: 'es' },
+  { url: 'https://www.microsiervos.com/index.xml', source: 'Microsiervos', category: 'Tecnología', lang: 'es' },
 
   // --- INTELIGENCIA ARTIFICIAL (IA) ---
-  { url: 'https://www.genbeta.com/categoria/inteligencia-artificial/rss', source: 'Genbeta IA', category: 'IA', lang: 'es' },
   { url: 'https://www.xataka.com/tag/inteligencia-artificial/rss', source: 'Xataka IA', category: 'IA', lang: 'es' },
   { url: 'https://elpais.com/noticias/inteligencia-artificial/rss/', source: 'El País IA', category: 'IA', lang: 'es' },
+  { url: 'https://www.genbeta.com/categoria/inteligencia-artificial/rss', source: 'Genbeta IA', category: 'IA', lang: 'es' },
   { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch AI', category: 'IA', lang: 'en' },
-  { url: 'https://www.wired.com/category/science/ai/feed/rss', source: 'Wired AI', category: 'IA', lang: 'en' },
-  { url: 'https://openai.com/news/rss.xml', source: 'OpenAI', category: 'IA', lang: 'en' },
-  { url: 'https://deepmind.google/blog/rss.xml', source: 'Google DeepMind', category: 'IA', lang: 'en' },
   { url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed/', source: 'MIT Tech AI', category: 'IA', lang: 'en' },
 
   // --- APPLE ---
   { url: 'https://www.applesfera.com/index.xml', source: 'Applesfera', category: 'Apple', lang: 'es' },
   { url: 'https://9to5mac.com/feed/', source: '9to5Mac', category: 'Apple', lang: 'en' },
   { url: 'https://www.macrumors.com/macrumors.xml', source: 'MacRumors', category: 'Apple', lang: 'en' },
-  { url: 'https://www.cultofmac.com/feed/', source: 'Cult of Mac', category: 'Apple', lang: 'en' },
-  { url: 'https://appleinsider.com/rss/news/', source: 'Appleinsider', category: 'Apple', lang: 'en' },
 
   // --- ANDROID ---
   { url: 'https://www.xatakandroid.com/index.xml', source: 'Xatakandroid', category: 'Android', lang: 'es' },
   { url: 'https://9to5google.com/feed/', source: '9to5Google', category: 'Android', lang: 'en' },
   { url: 'https://www.androidauthority.com/feed/', source: 'Android Authority', category: 'Android', lang: 'en' },
-  { url: 'https://www.androidcentral.com/feed', source: 'Android Central', category: 'Android', lang: 'en' },
-  { url: 'https://www.androidpolice.com/feed/', source: 'Android Police', category: 'Android', lang: 'en' },
 
   // --- FOTOGRAFÍA ---
   { url: 'https://www.photolari.com/feed/', source: 'Photolari', category: 'Fotografía', lang: 'es' },
   { url: 'https://www.xatakafoto.com/index.xml', source: 'Xataka Foto', category: 'Fotografía', lang: 'es' },
-  { url: 'https://www.albedomedia.com/feed/', source: 'Albedo Media', category: 'Fotografía', lang: 'es' },
-  { url: 'https://www.casanovafoto.com/blog/feed/', source: 'Casanova Blog', category: 'Fotografía', lang: 'es' },
   { url: 'https://www.dpreview.com/feeds/news.rss', source: 'DPReview', category: 'Fotografía', lang: 'en' },
-  { url: 'https://fstoppers.com/rss', source: 'Fstoppers', category: 'Fotografía', lang: 'en' },
   { url: 'https://petapixel.com/feed/', source: 'PetaPixel', category: 'Fotografía', lang: 'en' },
-  { url: 'https://canonrumors.com/feed/', source: 'Canon Rumors', category: 'Fotografía', lang: 'en' },
-  { url: 'https://nikonrumors.com/feed/', source: 'Nikon Rumors', category: 'Fotografía', lang: 'en' },
-  { url: 'https://sonyalpharumors.com/feed/', source: 'Sony Rumors', category: 'Fotografía', lang: 'en' },
 
   // --- POLÍTICA ---
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml', source: 'NYT Politics', category: 'Política', lang: 'en' },
-  { url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/politica/portada.xml', source: 'El País Política', category: 'Política', lang: 'es' },
-  { url: 'http://feeds.bbci.co.uk/news/politics/rss.xml', source: 'BBC Politics', category: 'Política', lang: 'en' },
+  { url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/politica/portada', source: 'El País Política', category: 'Política', lang: 'es' },
   { url: 'https://www.politico.com/rss/politics.xml', source: 'Politico', category: 'Política', lang: 'en' },
 
   // --- MODA ---
   { url: 'https://elpais.com/rss/smoda/portada.xml', source: 'S Moda', category: 'Moda', lang: 'es' },
-  { url: 'https://www.vogue.com/feed/rss', source: 'Vogue', category: 'Moda', lang: 'en' },
-  { url: 'https://www.elle.com/rss/all.xml', source: 'Elle', category: 'Moda', lang: 'en' }
+  { url: 'https://www.vogue.com/feed/rss', source: 'Vogue', category: 'Moda', lang: 'en' }
 ];
 
 async function extractImageDeep(link: string, category: string): Promise<string> {
@@ -172,39 +148,48 @@ function extractBullets(item: any): string[] {
 
 export async function fetchAndUpdateFeeds() {
   await deleteOldArticles(3);
-  let added = 0;
-  for (const feedConfig of FEEDS) {
-    try {
-      const feed = await parser.parseURL(feedConfig.url);
-      for (const item of feed.items) {
-        if (!item.link) continue;
+
+  const results = await Promise.allSettled(
+    FEEDS.map(async (feedConfig) => {
+      let feedAdded = 0;
+      try {
+        const feed = await parser.parseURL(feedConfig.url);
+        // Process up to 10 articles per feed to keep execution fast
+        const itemsToProcess = feed.items.slice(0, 10);
         
-        let imageUrl = extractImage(item, feedConfig.category);
-        if (!imageUrl) {
-          imageUrl = await extractImageDeep(item.link, feedConfig.category);
+        for (const item of itemsToProcess) {
+          if (!item.link) continue;
+          
+          let imageUrl = extractImage(item, feedConfig.category);
+          if (!imageUrl) {
+            imageUrl = await extractImageDeep(item.link, feedConfig.category);
+          }
+
+          const newArticle: Article = {
+            id: Math.random().toString(36).substring(2, 10),
+            title: item.title?.trim() || 'Sin Titular',
+            link: item.link,
+            image: imageUrl,
+            source: feedConfig.source,
+            pubDate: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(),
+            bullets: extractBullets(item),
+            category: feedConfig.category,
+            lang: feedConfig.lang
+          };
+          
+          try {
+            await saveArticle(newArticle);
+            feedAdded++;
+          } catch(e) {}
         }
-
-        const newArticle: Article = {
-          id: Math.random().toString(36).substring(2, 10),
-          title: item.title?.trim() || 'Sin Titular',
-          link: item.link,
-          image: imageUrl,
-          source: feedConfig.source,
-          pubDate: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(),
-          bullets: extractBullets(item),
-          category: feedConfig.category,
-          lang: feedConfig.lang
-        };
-        try {
-          await saveArticle(newArticle);
-          added++;
-        } catch(e) {}
+      } catch (err) {
+        console.error(`Error fetching ${feedConfig.source}:`, err);
       }
-    } catch (err) {
-      console.error(`Error fetching ${feedConfig.source}:`, err);
-    }
-  }
+      return feedAdded;
+    })
+  );
 
+  const totalAdded = results.reduce((sum, r) => sum + (r.status === 'fulfilled' ? r.value : 0), 0);
   await setLastUpdate(Date.now());
-  return added;
+  return totalAdded;
 }
